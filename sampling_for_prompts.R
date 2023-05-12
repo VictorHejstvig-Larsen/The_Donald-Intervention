@@ -4,7 +4,6 @@ library(httr)
 library(jsonlite)
 `%nin%` = Negate(`%in%`)
 
-setwd("C:/Users/45533/OneDrive - Aarhus universitet/Kodning/Python/PycharmProjects/DS_scraping_pushshift")
 TD_analysis <- import("TD_analysis_dataset.csv")
 
   #Fixing some date stuff
@@ -17,6 +16,7 @@ TD_analysis <- TD_analysis[complete.cases(TD_analysis$comment),]
 
 #users
 users_analysis <- import("users_analysis_dataset.csv")
+#Removing all occurences of "The_Donald" from users to isolate to the rest of Reddit
 users_analysis <- users_analysis[users_analysis$subreddit != "The_Donald",]
 users_analysis <- users_analysis[complete.cases(users_analysis$comment),]
 
@@ -35,7 +35,7 @@ inds <- 1:nrow(TD_sample)
 
 # Keep taking 40 row subsets until character length exceeds 12000
 i <- 1 
-while(nchar(paste(TD_sample[i:(i+39),]$comment, collapse = '')) < 11000) {
+while(nchar(paste(TD_sample[i:(i+39),]$comment, collapse = '')) < 12000) {
   i <- i + 40
 } 
 
@@ -59,7 +59,7 @@ users_sample <- users_analysis[sample(nrow(users_analysis),70000),]
 
 inds <- 1:nrow(users_sample)
 i <- 1 
-while(nchar(paste(users_sample[i:(i+39),]$comment, collapse = '')) < 11000) {
+while(nchar(paste(users_sample[i:(i+39),]$comment, collapse = '')) < 12000) {
   i <- i + 40
 } 
 last_ind <- i:(i+39)  
@@ -72,7 +72,7 @@ users_sample$comment <- gsub("\n", "", users_sample$comment)
 #Patriots
 inds <- 1:nrow(patriots_population_analysis)
 i <- 1 
-while(nchar(paste(patriots_population_analysis[i:(i+39),]$comment, collapse = '')) < 11000) {
+while(nchar(paste(patriots_population_analysis[i:(i+39),]$comment, collapse = '')) < 12000) {
   i <- i + 40
 } 
 last_ind <- i:(i+39)  
@@ -80,7 +80,8 @@ inds <- inds[-c(last_ind)]
 inds <- c(inds, last_ind) 
 patriots_population_analysis <- patriots_population_analysis[inds, ]
 patriots_population_analysis$comment <- gsub("\n", "", patriots_population_analysis$comment)
-
+set.seed(9512)
+patriots-users <- patriots_population_analysis[sample(nrow(patriots_population_analysis),60000),]
 
 write.csv(users_sample, "users_sample.csv")
 write.csv(TD_sample, "TD_sample.csv")
