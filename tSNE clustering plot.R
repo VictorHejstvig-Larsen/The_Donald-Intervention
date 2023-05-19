@@ -10,8 +10,8 @@ library(ggforce)
 library(stringr)
 library(ggrepel)
 
-setwd("C:/Users/Victor/OneDrive - Aarhus universitet/Kodning/Python/PycharmProjects/DS_scraping_pushshift")
-df <- import("C:/Users/Victor/OneDrive - Aarhus universitet/Kodning/Python/PycharmProjects/DS_scraping_pushshift/theDonaldComments.csv")
+setwd("")
+df <- import("theDonaldComments.csv")
 #Removing deleted and removed comments, since they will naturally cluster without any substantive meaning
 
 `%nin%` = Negate(`%in%`)
@@ -85,6 +85,7 @@ my_colors <- c('#e6194b', '#3cb44b', '#ffe119',
 
 thedonaldbatch$clustersandtext <- paste(thedonaldbatch$body, thedonaldbatch$cluster)
 
+#Interactive plot
 plot_ly(thedonaldbatch, x = ~ tsne1, y = ~ tsne2,
              type = 'scatter', mode = 'markers', text = ~ clustersandtext, 
              alpha=0.5, 
@@ -95,10 +96,11 @@ plot_ly(thedonaldbatch, x = ~ tsne1, y = ~ tsne2,
 png(file="tsne.png",
     width=1400, height=800)
 
+#Static plot
 ggplot(thedonaldbatch, aes(x = tsne1, y = tsne2, color = factor(cluster))) + 
   geom_point(alpha = 0.2) +
   scale_color_manual(values = my_colors) +
-  labs(x = "t-SNE Component 1", y = "t-SNE Component 2", color = "Cluster") +
+  labs(x = "t-SNE Dimension 1", y = "t-SNE Dimension 2", color = "Cluster") +
   theme_bw() +
   theme(legend.position = "none", 
         panel.grid = element_blank(),
@@ -106,7 +108,7 @@ ggplot(thedonaldbatch, aes(x = tsne1, y = tsne2, color = factor(cluster))) +
         axis.line = element_blank(),
         axis.ticks = element_blank(),
         axis.title=element_text(size=30, color="black"),
-        axis.text = element_text(size = 30, color = "black"))+
+        axis.text = element_text(size =30, color = "black"))+
   guides(color="none")
 dev.off()
 
@@ -142,18 +144,18 @@ png(file="tsne_centers.png",
 
 plottingdata %>% 
   ggplot(aes(tsne1center, tsne2center)) +
-  geom_point(aes(size = clusterfrequency, color = cluster), alpha=0.4)+
+  geom_point(aes(size = clusterfrequency, color = factor(cluster)), alpha=0.4)+
   theme_minimal()+
   scale_size_continuous(range = c(2, 30))+
   labs(x = "t-SNE Dimension 1", y = "t-SNE Dimension 2", size = 16, color = "black") +
-  geom_label_repel(aes(fill=cluster, fontface="bold", label = str_wrap(clusterlabels, width = max_width)),
+  geom_label_repel(aes(fill=factor(cluster), fontface="bold", label = str_wrap(clusterlabels, width = max_width)),
              size = 8, nudge_y = -0.2,
             color="white", alpha=0.2,   label.size = NA, max.overlaps=20) +
   geom_label_repel(aes(label=str_wrap(clusterlabels, width = max_width)), fill=NA, nudge_y = -0.2, size=8, label.size=NA,
                    fontface="bold", color="black",max.overlaps=20)+
   guides(color = "none", size="none", alpha="none", fill="none")+
-  scale_color_gradient(low = "#ff00ff", high = "#339999") +
-  scale_fill_gradient(low = "#ff00ff", high = "#339999") +
+  scale_color_manual(values=my_colors) +
+  scale_fill_manual(values=my_colors) +
   theme(legend.position = "none", 
         panel.grid = element_blank(),
         panel.border = element_blank(),
